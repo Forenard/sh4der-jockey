@@ -37,7 +37,10 @@ rustfft = "6.0"
 serde_yaml = "0.9"
 simplelog = "0.12"
 take_mut = "0.2"
-winapi = { version = "0.3.9", features = ["wincon"] }
+winapi = { version = "0.3.9", features = ["wincon", "d3d11", "dxgi", "dxgitype", "winerror", "combaseapi", "objbase", "d3d11_1", "memoryapi", "handleapi", "fileapi"] }
+
+# [target.'cfg(windows)'.dependencies]
+# spout_texture_share = "0.1.0"  # Commented out due to libclang dependency issues
 
 [build-dependencies]
 anyhow = "1.0"

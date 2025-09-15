@@ -26,6 +26,8 @@ mod config;
 mod midi;
 mod network;
 mod pipeline;
+mod spout;
+mod spout_native;
 mod stage;
 mod uniforms;
 
@@ -35,6 +37,7 @@ pub use config::*;
 pub use midi::*;
 pub use network::*;
 pub use pipeline::*;
+pub use spout::*;
 pub use stage::*;
 pub use uniforms::*;
 
@@ -71,6 +74,7 @@ pub struct Jockey {
     pub midi: Midi,
     pub audio: Audio,
     pub ndi: Ndi,
+    pub spout: Spout,
     pub pipeline_files: Vec<String>,
     pub pipeline_index: usize,
     pub pipeline: Pipeline,
@@ -270,6 +274,7 @@ impl Jockey {
         let pipeline = Pipeline::splash_screen();
         let midi = Midi::new(&config, config_folder_path.as_deref());
         let ndi = Ndi::with_config_path(config_folder_path.clone());
+        let spout = Spout::new();
 
         let console = "No pipeline has been built yet".into();
 
@@ -286,6 +291,7 @@ impl Jockey {
             midi,
             audio,
             ndi,
+            spout,
             pipeline_files: Vec::new(),
             pipeline,
             pipeline_index: 0,
@@ -466,6 +472,12 @@ impl Jockey {
                 let requests = self.pipeline.requested_ndi_sources.values();
                 if let Err(err) = self.ndi.connect(&requests) {
                     log::error!("Failed to connect to NDI sources: {}", err);
+                }
+
+                // update spout module
+                let spout_requests = self.pipeline.requested_spout_sources.values();
+                if let Err(err) = self.spout.connect(&spout_requests) {
+                    log::error!("Failed to connect to Spout sources: {}", err);
                 }
             }
         }
@@ -662,6 +674,16 @@ impl Jockey {
                     .downcast_mut::<Texture2D>()
                     .unwrap();
                 self.ndi.update_texture(src_name, tex);
+            }
+
+            for (tex_name, src_name) in self.pipeline.requested_spout_sources.iter() {
+                let tex = self.pipeline.buffers.get_mut(tex_name).unwrap();
+                let tex = Rc::get_mut(tex)
+                    .unwrap()
+                    .as_any_mut()
+                    .downcast_mut::<Texture2D>()
+                    .unwrap();
+                self.spout.update_texture(src_name, tex);
             }
 
             audio_tex_update(

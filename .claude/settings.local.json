@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cargo:*)",
+      "Bash(.\\target\\debug\\sh4der-jockey.exe:*)",
+      "Bash(target\\debug\\sh4der-jockey.exe:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

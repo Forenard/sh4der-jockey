@@ -1,0 +1,8 @@
+spout:
+  - source: "TestSpoutSender"
+    name: "spout_texture"
+
+stages:
+  - fs: "spout_test.glsl"
+    uniforms:
+      mix_factor: 0.8

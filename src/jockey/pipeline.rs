@@ -41,6 +41,7 @@ pub struct Pipeline {
     pub stages: Vec<Stage>,
     pub buffers: HashMap<CString, Rc<dyn Texture>>,
     pub requested_ndi_sources: HashMap<CString, String>,
+    pub requested_spout_sources: HashMap<CString, String>,
     pub blending: bool,
 }
 
@@ -71,6 +72,7 @@ impl Pipeline {
             stages,
             buffers: HashMap::new(),
             requested_ndi_sources: HashMap::new(),
+            requested_spout_sources: HashMap::new(),
             blending: false,
         }
     }
@@ -392,6 +394,55 @@ impl Pipeline {
             buffers.insert(name, tex);
         }
 
+        //parse spout section
+        let spout_sources = match object.get("spout") {
+            Some(Value::Sequence(s)) => s.clone(),
+            None => Vec::new(),
+            Some(s) => {
+                return Err(format!(
+                    "Expected \"spout\" to be an array, got {:?} instead.",
+                    s
+                ));
+            }
+        };
+
+        let mut requested_spout_sources = HashMap::new();
+        for src in spout_sources {
+            let source = match src.get("source") {
+                Some(Value::String(s)) => s.clone(),
+                s => {
+                    return Err(format!(
+                        "Expected spout.source to be a string, got {:?} instead",
+                        s
+                    ))
+                }
+            };
+            let name = match src.get("name") {
+                Some(Value::String(s)) => CString::new(s.clone()).unwrap(),
+                s => {
+                    return Err(format!(
+                        "Expected spout.name to be a string, got {:?} instead",
+                        s
+                    ))
+                }
+            };
+
+            if buffers.get(&name).is_some() {
+                return Err(format!(
+                    "Texture {:?} already exists, please try a different name",
+                    name
+                ));
+            }
+
+            let tex = TextureBuilder::parse(&src, false, true)?
+                .set_float(false)
+                .set_resolution(vec![1, 1])
+                .build_texture();
+
+            requested_spout_sources.insert(name.clone(), source);
+            buffers.insert(name, tex);
+        }
+
         // parse stages section
         let passes = match object.get("stages") {
             Some(Value::Sequence(s)) => s.clone(),
@@ -478,6 +529,7 @@ impl Pipeline {
             let needed = used_buffers.contains(name);
             if !needed {
                 requested_ndi_sources.remove(name);
+                requested_spout_sources.remove(name);
             }
             needed
         });
@@ -487,6 +539,7 @@ impl Pipeline {
                 stages,
                 buffers,
                 requested_ndi_sources,
+                requested_spout_sources,
                 blending,
             },
             UpdateRequest {
