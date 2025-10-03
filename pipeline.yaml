@@ -1,0 +1,10 @@
+stages:
+  - fs: "scene.frag"
+
+osc:
+  port: 9005
+  mappings:
+    brightness: "/volume"
+    multi1: "/2/multifader/1"
+    multi2: "/2/multifader/2"
+    multi3: "/2/multifader/3"

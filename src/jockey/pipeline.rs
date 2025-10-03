@@ -41,6 +41,7 @@ pub struct Pipeline {
     pub stages: Vec<Stage>,
     pub buffers: HashMap<CString, Rc<dyn Texture>>,
     pub requested_ndi_sources: HashMap<CString, String>,
+    pub osc_config: Option<OscConfig>,
     pub blending: bool,
 }
 
@@ -71,6 +72,7 @@ impl Pipeline {
             stages,
             buffers: HashMap::new(),
             requested_ndi_sources: HashMap::new(),
+            osc_config: None,
             blending: false,
         }
     }
@@ -284,6 +286,12 @@ impl Pipeline {
 
         yield_now().await;
 
+        // parse OSC section
+        let osc_config = match object.get("osc") {
+            Some(osc_obj) => Some(OscConfig::from_yaml(osc_obj)?),
+            None => None,
+        };
+
         // parse images section
         let images = match object.get("images") {
             Some(Value::Sequence(s)) => s.clone(),
@@ -487,6 +495,7 @@ impl Pipeline {
                 stages,
                 buffers,
                 requested_ndi_sources,
+                osc_config,
                 blending,
             },
             UpdateRequest {

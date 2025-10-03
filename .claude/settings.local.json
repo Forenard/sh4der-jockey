@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cargo check:*)",
+      "Bash(cargo run:*)",
+      "Bash(set RUST_BACKTRACE=1)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

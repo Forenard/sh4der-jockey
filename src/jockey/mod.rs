@@ -25,6 +25,7 @@ mod beatsync;
 mod config;
 mod midi;
 mod network;
+mod osc;
 mod pipeline;
 mod stage;
 mod uniforms;
@@ -34,6 +35,7 @@ pub use beatsync::*;
 pub use config::*;
 pub use midi::*;
 pub use network::*;
+pub use osc::*;
 pub use pipeline::*;
 pub use stage::*;
 pub use uniforms::*;
@@ -71,6 +73,7 @@ pub struct Jockey {
     pub midi: Midi,
     pub audio: Audio,
     pub ndi: Ndi,
+    pub osc: OscReceiver,
     pub pipeline_files: Vec<String>,
     pub pipeline_index: usize,
     pub pipeline: Pipeline,
@@ -270,6 +273,7 @@ impl Jockey {
         let pipeline = Pipeline::splash_screen();
         let midi = Midi::new(&config, config_folder_path.as_deref());
         let ndi = Ndi::with_config_path(config_folder_path.clone());
+        let osc = OscReceiver::new();
 
         let console = "No pipeline has been built yet".into();
 
@@ -286,6 +290,7 @@ impl Jockey {
             midi,
             audio,
             ndi,
+            osc,
             pipeline_files: Vec::new(),
             pipeline,
             pipeline_index: 0,
@@ -466,6 +471,21 @@ impl Jockey {
                 let requests = self.pipeline.requested_ndi_sources.values();
                 if let Err(err) = self.ndi.connect(&requests) {
                     log::error!("Failed to connect to NDI sources: {}", err);
+                }
+
+                // update osc module
+                match &self.pipeline.osc_config {
+                    Some(osc_config) => {
+                        if let Err(err) = self.osc.start(osc_config.port) {
+                            log::error!("Failed to start OSC receiver: {}", err);
+                            self.console = format!("OSC Error: {}", err);
+                        } else {
+                            log::info!("OSC receiver active on port {}", osc_config.port);
+                        }
+                    }
+                    None => {
+                        self.osc.stop();
+                    }
                 }
             }
         }
@@ -886,6 +906,24 @@ impl Jockey {
                     gl::Uniform1fv(s_loc, self.midi.sliders.len() as _, &self.midi.sliders as _);
                     gl::Uniform4fv(b_loc, self.midi.buttons.len() as _, &buttons as _);
                     gl_debug_check!();
+                }
+
+                // Add OSC uniforms
+                if let Some(osc_config) = &self.pipeline.osc_config {
+                    let osc_values = self.osc.get_all_values();
+                    for (uniform_name, osc_address) in &osc_config.mappings {
+                        if let Some(value) = osc_values.get(osc_address) {
+                            if let Ok(uniform_cstr) = std::ffi::CString::new(uniform_name.as_str()) {
+                                let loc = gl::GetUniformLocation(stage.prog_id, uniform_cstr.as_ptr());
+                                if loc != -1 {
+                                    gl::Uniform1f(loc, *value);
+                                    gl_debug_check!();
+                                }
+                            } else {
+                                log::warn!("Invalid uniform name for OSC mapping: {}", uniform_name);
+                            }
+                        }
+                    }
                 }
 
                 // Add custom uniforms
