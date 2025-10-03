@@ -2,6 +2,7 @@ stages:
   - fs: "scene.frag"
 
 # Supported OSC data types:
+# default port is 9000 if not specified.
 # default type is "float" if not specified.
 # - "float": Standard floating point (default) -> `uniform float`
 # - "int": Integer values (converts floats by rounding) -> `uniform int`
