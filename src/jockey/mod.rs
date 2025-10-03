@@ -476,11 +476,15 @@ impl Jockey {
                 // update osc module
                 match &self.pipeline.osc_config {
                     Some(osc_config) => {
+                        // Update type mappings first
+                        self.osc.update_type_mappings(osc_config);
+
                         if let Err(err) = self.osc.start(osc_config.port) {
                             log::error!("Failed to start OSC receiver: {}", err);
                             self.console = format!("OSC Error: {}", err);
                         } else {
-                            log::info!("OSC receiver active on port {}", osc_config.port);
+                            log::info!("OSC receiver active on port {} with {} mappings",
+                                osc_config.port, osc_config.mappings.len());
                         }
                     }
                     None => {
@@ -911,12 +915,22 @@ impl Jockey {
                 // Add OSC uniforms
                 if let Some(osc_config) = &self.pipeline.osc_config {
                     let osc_values = self.osc.get_all_values();
-                    for (uniform_name, osc_address) in &osc_config.mappings {
-                        if let Some(value) = osc_values.get(osc_address) {
+                    for (uniform_name, mapping) in &osc_config.mappings {
+                        if let Some(value) = osc_values.get(&mapping.address) {
                             if let Ok(uniform_cstr) = std::ffi::CString::new(uniform_name.as_str()) {
                                 let loc = gl::GetUniformLocation(stage.prog_id, uniform_cstr.as_ptr());
                                 if loc != -1 {
-                                    gl::Uniform1f(loc, *value);
+                                    match value {
+                                        OscUniformValue::Float(f) => {
+                                            gl::Uniform1f(loc, *f);
+                                        }
+                                        OscUniformValue::Int(i) => {
+                                            gl::Uniform1i(loc, *i);
+                                        }
+                                        OscUniformValue::Bool(b) => {
+                                            gl::Uniform1i(loc, if *b { 1 } else { 0 });
+                                        }
+                                    }
                                     gl_debug_check!();
                                 }
                             } else {

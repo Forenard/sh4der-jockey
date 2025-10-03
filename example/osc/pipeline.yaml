@@ -1,0 +1,25 @@
+stages:
+  - fs: "scene.frag"
+
+# Supported OSC data types:
+# default type is "float" if not specified.
+# - "float": Standard floating point (default) -> `uniform float`
+# - "int": Integer values (converts floats by rounding) -> `uniform int`
+# - "bool": Boolean values -> `uniform bool`
+
+osc:
+  port: 9005
+  mappings:
+    # Float uniforms
+    float_test1: "/float1"
+    float_test2:
+      address: "/float2"
+      type: "float"
+    # Int uniform
+    int_test1:
+      address: "/int1"
+      type: "int"
+    # Bool uniform
+    bool_test1:
+      address: "/bool1"
+      type: "bool"
