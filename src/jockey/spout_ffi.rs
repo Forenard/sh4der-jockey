@@ -82,8 +82,18 @@ impl SpoutLibrarySender {
         let handle = self.spout_handle.ok_or("No Spout handle")?;
 
         unsafe {
-            // Set sender name (creates sender on first SendTexture call)
             let vtable = *(handle as *const *const SpoutVTable);
+
+            // If already initialized with different size, release first
+            if self.initialized && (self.width != width || self.height != height) {
+                log::info!("Spout sender '{}' resolution changed from {}x{} to {}x{}, releasing...",
+                    self.name.to_str().unwrap(), self.width, self.height, width, height);
+                let release_sender = (*vtable).release_sender;
+                release_sender(handle, 0);
+                self.initialized = false;
+            }
+
+            // Set sender name (creates sender on first SendTexture call)
             let set_sender_name = (*vtable).set_sender_name;
             set_sender_name(handle, self.name.as_ptr());
         }
