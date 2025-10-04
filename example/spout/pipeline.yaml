@@ -1,0 +1,6 @@
+stages:
+  - fs: "scene.frag"
+
+spout:
+  enabled: true
+  name: "Sh4derJockey"

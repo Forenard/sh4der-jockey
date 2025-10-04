@@ -3,7 +3,25 @@
     "allow": [
       "Bash(cargo check:*)",
       "Bash(cargo run:*)",
-      "Bash(set RUST_BACKTRACE=1)"
+      "Bash(set RUST_BACKTRACE=1)",
+      "WebSearch",
+      "WebFetch(domain:lib.rs)",
+      "WebFetch(domain:github.com)",
+      "Bash(timeout 3 cargo run)",
+      "Bash(set RUST_LOG=info)",
+      "Bash(Select-String -Pattern \"Spout|spout\")",
+      "Bash(Select-Object -First 10)",
+      "Bash(RUST_LOG=info timeout 3 cargo run)",
+      "Bash(RUST_LOG=debug timeout 5 cargo run)",
+      "Bash(set RUST_LOG=debug)",
+      "Bash(timeout 5 cargo run)",
+      "Bash(set RUST_LOG=trace)",
+      "Bash(cargo clean:*)",
+      "Bash(cargo:*)",
+      "Bash(set RUST_LOG=sh4der_jockey=debug)",
+      "Bash(timeout:*)",
+      "Bash(dumpbin:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

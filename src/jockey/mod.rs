@@ -27,6 +27,7 @@ mod midi;
 mod network;
 mod osc;
 mod pipeline;
+mod spout;
 mod stage;
 mod uniforms;
 
@@ -37,6 +38,7 @@ pub use midi::*;
 pub use network::*;
 pub use osc::*;
 pub use pipeline::*;
+pub use spout::*;
 pub use stage::*;
 pub use uniforms::*;
 
@@ -74,6 +76,7 @@ pub struct Jockey {
     pub audio: Audio,
     pub ndi: Ndi,
     pub osc: OscReceiver,
+    pub spout: Option<SpoutSender>,
     pub pipeline_files: Vec<String>,
     pub pipeline_index: usize,
     pub pipeline: Pipeline,
@@ -291,6 +294,7 @@ impl Jockey {
             audio,
             ndi,
             osc,
+            spout: None,
             pipeline_files: Vec::new(),
             pipeline,
             pipeline_index: 0,
@@ -489,6 +493,21 @@ impl Jockey {
                     }
                     None => {
                         self.osc.stop();
+                    }
+                }
+
+                // update spout module
+                match &self.pipeline.spout_config {
+                    Some(spout_config) if spout_config.enabled => {
+                        let sender = SpoutSender::new(&spout_config.sender_name);
+                        log::info!("Spout sender '{}' initialized", spout_config.sender_name);
+                        self.spout = Some(sender);
+                    }
+                    _ => {
+                        if self.spout.is_some() {
+                            log::info!("Spout sender disabled");
+                        }
+                        self.spout = None;
                     }
                 }
             }
@@ -1090,6 +1109,45 @@ impl Jockey {
             // log render time
             let stage_time = stage_start.elapsed().as_secs_f32();
             stage.perf.push(1000.0 * stage_time);
+        }
+
+        // Send texture to Spout if enabled
+        if let Some(spout) = &mut self.spout {
+            log::trace!("Spout sender is active, attempting to send frame");
+            // Get the current framebuffer's color attachment (texture ID 0 is the default framebuffer)
+            // We need to copy from the default framebuffer to send via Spout
+            unsafe {
+                let mut current_fbo: GLint = 0;
+                gl::GetIntegerv(gl::FRAMEBUFFER_BINDING, &mut current_fbo);
+                log::trace!("Current FBO: {}", current_fbo);
+
+                if current_fbo == 0 {
+                    // We're rendering to the default framebuffer, create a texture from it
+                    let mut temp_texture: GLuint = 0;
+                    gl::GenTextures(1, &mut temp_texture);
+                    gl::BindTexture(gl::TEXTURE_2D, temp_texture);
+                    gl::CopyTexImage2D(
+                        gl::TEXTURE_2D,
+                        0,
+                        gl::RGBA8,
+                        0,
+                        0,
+                        width as GLint,
+                        height as GLint,
+                        0,
+                    );
+
+                    if let Err(err) = spout.send_texture(temp_texture, width, height) {
+                        log::warn!("Failed to send texture to Spout: {}", err);
+                    }
+
+                    gl::DeleteTextures(1, &temp_texture);
+                } else {
+                    log::debug!("Spout: Not rendering to default framebuffer (FBO: {})", current_fbo);
+                }
+            }
+        } else {
+            log::trace!("Spout sender is not active");
         }
 
         self.ctx.context.swap_buffers().unwrap();

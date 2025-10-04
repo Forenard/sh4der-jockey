@@ -42,6 +42,7 @@ pub struct Pipeline {
     pub buffers: HashMap<CString, Rc<dyn Texture>>,
     pub requested_ndi_sources: HashMap<CString, String>,
     pub osc_config: Option<OscConfig>,
+    pub spout_config: Option<SpoutConfig>,
     pub blending: bool,
 }
 
@@ -73,6 +74,7 @@ impl Pipeline {
             buffers: HashMap::new(),
             requested_ndi_sources: HashMap::new(),
             osc_config: None,
+            spout_config: None,
             blending: false,
         }
     }
@@ -292,6 +294,12 @@ impl Pipeline {
             None => None,
         };
 
+        // parse Spout section
+        let spout_config = match object.get("spout") {
+            Some(spout_obj) => Some(SpoutConfig::from_yaml(spout_obj)?),
+            None => None,
+        };
+
         // parse images section
         let images = match object.get("images") {
             Some(Value::Sequence(s)) => s.clone(),
@@ -496,6 +504,7 @@ impl Pipeline {
                 buffers,
                 requested_ndi_sources,
                 osc_config,
+                spout_config,
                 blending,
             },
             UpdateRequest {

@@ -25,6 +25,7 @@ imgui = { git = "https://github.com/sp4ghet/imgui-rs", branch = "master" }
 imgui-opengl-renderer = { git = "https://github.com/sp4ghet/rust-imgui-opengl-renderer", branch = "master" }
 imgui-winit-support = { git = "https://github.com/sp4ghet/imgui-rs", branch = "master" }
 lazy_static = "1.4"
+libloading = "0.8"
 log = "0.4"
 midir = "0.10.0"
 ndi = { git = "https://github.com/slerpyyy/ndi-rs", branch = "main" }
@@ -38,7 +39,7 @@ rustfft = "6.0"
 serde_yaml = "0.9"
 simplelog = "0.12"
 take_mut = "0.2"
-winapi = { version = "0.3.9", features = ["wincon"] }
+winapi = { version = "0.3.9", features = ["wincon", "winuser", "handleapi", "synchapi", "memoryapi", "winerror"] }
 
 [build-dependencies]
 anyhow = "1.0"

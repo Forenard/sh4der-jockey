@@ -13,3 +13,7 @@ local/
 
 # Local History for Visual Studio Code
 .history/
+
+# Note: libs/SpoutLibrary.dll can be committed to Git for convenience,
+# or added to .gitignore if you prefer users to download it separately.
+# See SPOUT_SETUP.md for download instructions.

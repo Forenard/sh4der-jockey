@@ -11,6 +11,7 @@ provides 20+ audio textures and uniforms for audio-reactive effects,
 offers plenty of buttons and sliders which can be hooked up to midi controllers,
 allows for quick prototyping and live shader coding with automatic pipeline reloading,
 includes support for live NDI® video input,
+supports Spout texture sharing for Windows (with SpoutLibrary.dll),
 and so much more!
 
 ## Documentation
@@ -51,7 +52,9 @@ at your option.
 
 This program makes use of [NDI®](https://www.ndi.tv/) (Network Device Interface), a standard developed by [NewTek, Inc](https://www.newtek.com/).
 
-Please refer to https://www.ndi.tv/ for further information about this technology.
+This program supports [Spout](https://leadedge.github.io/) for texture sharing on Windows. Spout requires SpoutLibrary.dll - see [SPOUT_SETUP.md](SPOUT_SETUP.md) for installation instructions.
+
+Please refer to https://www.ndi.tv/ for NDI and https://leadedge.github.io/ for Spout for further information about these technologies.
 
 ## Contribution
 

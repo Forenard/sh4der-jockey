@@ -1,0 +1,41 @@
+PS C:\WorkSpace_C\CustomSh4derJockey\sh4der-jockey> target\debug\sh4der-jockey.exe -vv
+11:18:52 [INFO] Version: 0.3.1 (commit a237eb162cbe22)
+11:18:52 [INFO] Log level: INFO
+11:18:52 [INFO] Using config folder: \\?\C:\Users\Renar\AppData\Local\sh4der-jockey
+11:18:52 [WARN] Failed to load config.yaml: 指定されたファイルが見つかりません。 (os error 2)
+11:18:52 [INFO] Available Hosts: [Wasapi]
+11:18:52 [INFO] Connected to audio input device: "マイク (2- High Definition Audio Device)"
+11:18:52 [INFO] Supported Config: SupportedStreamConfig { channels: 2, sample_rate: SampleRate(48000), buffer_size: Range { min: 0, max: 4294967295 }, sample_format: F32 }
+11:18:52 [INFO] Creating with config: StreamConfig { channels: 2, sample_rate: SampleRate(48000), buffer_size: Default }
+11:18:52 [INFO] Loaded midi bindings successfully
+11:18:52 [INFO] Connecting to input port: SMC-PADPocket-bt
+11:18:52 [WARN] Failed to connect to SMC-PADPocket-bt: could not create Windows MM MIDI input port
+11:18:52 [INFO] Connecting to input port: DDJ-400
+11:18:52 [INFO] Found NDI library at C:\WorkSpace_C\CustomSh4derJockey\sh4der-jockey\target\debug\Processing.NDI.Lib.x64.dll
+11:18:52 [INFO] Found pipeline files: []
+11:18:52 [WARN] Failed to find pipeline file
+11:18:58 [INFO] Setting cwd to C:\WorkSpace_C\CustomSh4derJockey\sh4der-jockey\example\spout
+11:18:58 [WARN] Failed to load config.yaml: 指定されたファイルが見つかりません。 (os error 2)
+11:18:58 [INFO] Loaded midi bindings successfully
+11:18:58 [INFO] Connecting to input port: SMC-PADPocket-bt
+11:18:58 [WARN] Failed to connect to SMC-PADPocket-bt: could not create Windows MM MIDI input port
+11:18:58 [INFO] Connecting to input port: DDJ-400
+11:18:58 [INFO] Available Hosts: [Wasapi]
+11:18:58 [INFO] Connected to audio input device: "マイク (2- High Definition Audio Device)"
+11:18:58 [INFO] Supported Config: SupportedStreamConfig { channels: 2, sample_rate: SampleRate(48000), buffer_size: Range { min: 0, max: 4294967295 }, sample_format: F32 }
+11:18:58 [INFO] Creating with config: StreamConfig { channels: 2, sample_rate: SampleRate(48000), buffer_size: Default }
+11:18:58 [INFO] Found pipeline files: ["pipeline.yaml"]
+11:18:58 [INFO] Start building pipeline
+11:18:58 [INFO] Build pipeline over a span of 0.0590123s
+11:18:58 [INFO] OSC receiver stopped
+11:18:58 [INFO] Creating Spout sender: Sh4derJockey
+11:18:58 [INFO] Got Spout instance handle
+11:18:58 [INFO] Using SpoutLibrary.dll for Spout sending
+11:18:58 [INFO] Spout sender 'Sh4derJockey' initialized
+11:18:58 [INFO] Spout sender 'Sh4derJockey' configured (1280x720)
+11:19:17 [INFO] Spout sender 'Sh4derJockey' configured (1520x720)
+11:19:24 [INFO] Spout sender 'Sh4derJockey' configured (1686x720)
+11:19:26 [INFO] Spout sender 'Sh4derJockey' configured (1130x720)
+11:20:07 [INFO] Bye bye!
+11:20:07 [INFO] OSC receiver stopped
+11:20:07 [INFO] Released Spout sender 'Sh4derJockey'
